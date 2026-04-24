@@ -929,6 +929,7 @@ function confirmScan() {
     ts: Date.now(),
     attrezzatura: att.nome,
     attrezzaturaId: id,
+    qrTesto: att.qr||'',
     qr: pendingScan.qr,
     operatore: currentOperator.nome + ' ' + currentOperator.cognome,
     operatoreId: currentOperator.id,
@@ -999,7 +1000,10 @@ function renderTable() {
   }
   tbody.innerHTML = list.map((m,i) => `<tr>
     <td style="color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:0.78rem">${list.length-i}</td>
-    <td><div class="qr-data">${escHtml(m.attrezzatura||m.qr||'—')}${m.manutenzione?'<span class="maint-icon">🔧</span>':''}</div></td>
+    <td>
+      <div class="qr-data">${escHtml(m.attrezzatura||'—')}${m.manutenzione?'<span class="maint-icon">🔧</span>':''}</div>
+      ${(m.qrTesto||m.qr)?`<div class="qr-sub">${escHtml(m.qrTesto||m.qr)}</div>`:''}
+    </td>
     <td><div style="font-size:0.85rem">${escHtml(m.operatore||'—')}</div></td>
     <td><div class="time-cell">${m.orario||'—'}<div style="font-size:0.72rem;color:var(--text-dim)">${m.data||''}</div></div></td>
     <td><div class="time-cell">${m.quantita!==undefined?m.quantita+'/'+m.quantitaTot:'—'}</div></td>
@@ -1172,7 +1176,10 @@ function renderLog() {
   container.innerHTML = movimenti.map(m=>`
     <div class="log-row">
       <span style="color:${m.tipo==='in'?'var(--in-color)':'var(--out-color)'};font-size:1.1rem">${m.tipo==='in'?'📥':'📤'}</span>
-      <span style="flex:2;min-width:120px;font-weight:700">${escHtml(m.attrezzatura||m.qr||'—')}${m.manutenzione?'🔧':''}</span>
+      <span style="flex:2;min-width:120px;">
+        <span style="font-weight:700">${escHtml(m.attrezzatura||'—')}${m.manutenzione?'🔧':''}</span>
+        ${(m.qrTesto||m.qr)?`<div style="font-size:0.75rem;color:var(--text-dim);margin-top:2px;">${escHtml(m.qrTesto||m.qr)}</div>`:''}
+      </span>
       <span style="flex:1.5;color:var(--accent3)">${escHtml(m.operatore||'—')}</span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--text-dim)">${m.data||''} ${m.orario||''}</span>
       <span>${m.quantita!==undefined?m.quantita+'/'+m.quantitaTot:'—'}</span>
