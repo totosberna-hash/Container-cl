@@ -438,7 +438,7 @@ function closeQrScan() {
       </div>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>Attrezzatura</th><th>QR</th><th>Dimensioni</th><th>Nel container</th><th>Fuori</th><th>Stato</th><th>Manutenzione</th></tr></thead>
+          <thead><tr><th>Attrezzatura</th><th>QR</th><th>Dimensioni</th><th>Container</th><th>Cassa</th><th>Nel container</th><th>Manutenzione</th></tr></thead>
           <tbody id="appAttrezziBody"><tr><td colspan="7"><div class="empty-state">Nessuna attrezzatura nel catalogo.</div></td></tr></tbody>
         </table>
       </div>
@@ -511,6 +511,8 @@ function closeQrScan() {
             <div class="form-group"><div class="form-label">Quantità totale *</div><input class="form-input" id="fQtot" type="number" min="1" placeholder="es. 6"></div>
             <div class="form-group"><div class="form-label">Quantità nel container</div><input class="form-input" id="fQin" type="number" min="0" placeholder="es. 6"></div>
             <div class="form-group"><div class="form-label">Dimensioni</div><input class="form-input" id="fDim" placeholder="es. 170 cm oro"></div>
+            <div class="form-group"><div class="form-label">Container</div><input class="form-input" id="fContainer" placeholder="es. 36"></div>
+            <div class="form-group"><div class="form-label">Cassa</div><input class="form-input" id="fCassa" placeholder="es. fuori cassa"></div>
             <div class="form-group"><div class="form-label">Data manutenzione (gg/mm/aaaa)</div><input class="form-input" id="fMaintDate" placeholder="es. 15/06/2025"></div>
             <div class="form-group full"><div class="form-label">Note manutenzione</div><input class="form-input" id="fMaintNote" placeholder="es. Controllare guarnizioni e collarino"></div>
           </div>
@@ -992,10 +994,7 @@ function renderAppAttrezzi() {
   tbody.innerHTML = list.map(([id,a]) => {
     const qin  = parseInt(a.qin)  || 0;
     const qtot = parseInt(a.qtot) || 1;
-    const fuori = qtot - qin;
     const mDue = isMaintenanceDue(a.maintDate);
-    const statoColor = qin === qtot ? 'var(--in-color)' : qin === 0 ? 'var(--out-color)' : 'var(--warn-color)';
-    const statoLabel = qin === qtot ? 'Tutti dentro' : qin === 0 ? 'Tutti fuori' : 'Parziale';
     return `<tr>
       <td><div class="qr-data">${escHtml(a.nome||'—')}</div></td>
       <td><div style="font-size:0.78rem;color:var(--text-dim);word-break:break-word;max-width:180px;">${escHtml(a.qr||'—')}</div></td>
@@ -1086,6 +1085,7 @@ function renderAttrezzi() {
       <div class="item-card-info">
         <div class="item-card-name">${escHtml(a.nome)}${mDue?'<span class="maint-icon">🔧</span>':''}</div>
         <div class="item-card-sub">QR: ${escHtml(a.qr||'—')} ${a.dim?'• '+escHtml(a.dim):''}</div>
+        <div class="item-card-sub">${a.container?'Container: '+escHtml(a.container):''} ${a.cassa?'• Cassa: '+escHtml(a.cassa):''}</div>
         <div class="item-card-sub">Nel container: ${qin}/${qtot} pezzi</div>
       </div>
       <div>
@@ -1099,7 +1099,7 @@ function newAttrezzo() {
   currentAttrezzoId = null;
   document.getElementById('formAttrezzoTitle').textContent = 'Nuova attrezzatura';
   document.getElementById('btnDeleteAttrezzo').style.display = 'none';
-  ['fNome','fQr','fDim','fMaintDate','fMaintNote'].forEach(id=>document.getElementById(id).value='');
+  ['fNome','fQr','fDim','fContainer','fCassa','fMaintDate','fMaintNote'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fQtot').value='1';
   document.getElementById('fQin').value='1';
   document.getElementById('attrezziList').style.display='none';
@@ -1115,7 +1115,9 @@ function editAttrezzo(id) {
   document.getElementById('fQr').value   = a.qr||'';
   document.getElementById('fQtot').value = a.qtot||1;
   document.getElementById('fQin').value  = a.qin||0;
-  document.getElementById('fDim').value  = a.dim||'';
+  document.getElementById('fDim').value       = a.dim||'';
+  document.getElementById('fContainer').value  = a.container||'';
+  document.getElementById('fCassa').value      = a.cassa||'';
   document.getElementById('fMaintDate').value = a.maintDate||'';
   document.getElementById('fMaintNote').value = a.maintNote||'';
   document.getElementById('attrezziList').style.display='none';
@@ -1134,6 +1136,8 @@ function saveAttrezzo() {
   if (qin>qtot) { showToast('Quantità nel container non può superare il totale','out'); return; }
   const obj = { nome, qr, qtot, qin,
     dim: document.getElementById('fDim').value.trim(),
+    container: document.getElementById('fContainer').value.trim(),
+    cassa: document.getElementById('fCassa').value.trim(),
     maintDate: document.getElementById('fMaintDate').value.trim(),
     maintNote: document.getElementById('fMaintNote').value.trim()
   };
