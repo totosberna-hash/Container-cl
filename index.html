@@ -68,6 +68,61 @@ function closeQrScan() {
   qrScanTargetField = null;
 }
 
+
+// ── SESSIONI ──────────────────────────────────────────
+function renderSessioni() {
+  const container = document.getElementById('sessioniContainer');
+  if (!container) return;
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    if (!list.length) {
+      container.innerHTML = `<div class="empty-state">Nessuna sessione registrata.</div>`;
+      return;
+    }
+    container.innerHTML = list.map(([id, s]) => {
+      let html = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+          <div style="font-size:1.3rem">👤</div>
+          <div>
+            <div style="font-weight:800;font-size:1rem;">${escHtml(s.operatore||'—')}</div>
+            <div style="font-size:0.78rem;color:var(--text-dim);">${s.data||''} alle ${s.orario||''}</div>
+          </div>
+        </div>`;
+
+      if (s.uscite) {
+        html += `<div style="background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.25);border-radius:10px;padding:12px;margin-bottom:10px;">
+          <div style="font-weight:700;color:var(--out-color);margin-bottom:6px;">📤 Uscita</div>
+          <div style="font-size:0.85rem;margin-bottom:8px;color:var(--text);">📝 ${escHtml(s.uscite.nota||'—')}</div>
+          <ul style="margin-left:16px;font-size:0.82rem;color:var(--text-dim);">
+            ${(s.uscite.attrezzi||[]).map(a=>`<li>${escHtml(a.nome)} — ${escHtml(a.quantita)}</li>`).join('')}
+          </ul>
+        </div>`;
+      }
+
+      if (s.ingressi) {
+        html += `<div style="background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.25);border-radius:10px;padding:12px;">
+          <div style="font-weight:700;color:var(--in-color);margin-bottom:6px;">📥 Ingresso</div>
+          <div style="font-size:0.85rem;margin-bottom:8px;color:var(--text);">📝 ${escHtml(s.ingressi.nota||'—')}</div>
+          <ul style="margin-left:16px;font-size:0.82rem;color:var(--text-dim);">
+            ${(s.ingressi.attrezzi||[]).map(a=>`<li>${escHtml(a.nome)} — ${escHtml(a.quantita)}</li>`).join('')}
+          </ul>
+        </div>`;
+      }
+
+      html += `</div>`;
+      return html;
+    }).join('');
+  });
+}
+
+function clearSessioni() {
+  if (confirm('Eliminare tutte le sessioni dal promemoria?')) {
+    sessionRef.remove();
+    showToast('🗑 Promemoria svuotato', 'out');
+  }
+}
+
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
 // ── QR SCAN MANAGER ───────────────────────────────────
@@ -131,6 +186,61 @@ function closeQrScan() {
   document.getElementById('modalQrScan').classList.remove('open');
   scannedQrValue = null;
   qrScanTargetField = null;
+}
+
+
+// ── SESSIONI ──────────────────────────────────────────
+function renderSessioni() {
+  const container = document.getElementById('sessioniContainer');
+  if (!container) return;
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    if (!list.length) {
+      container.innerHTML = `<div class="empty-state">Nessuna sessione registrata.</div>`;
+      return;
+    }
+    container.innerHTML = list.map(([id, s]) => {
+      let html = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+          <div style="font-size:1.3rem">👤</div>
+          <div>
+            <div style="font-weight:800;font-size:1rem;">${escHtml(s.operatore||'—')}</div>
+            <div style="font-size:0.78rem;color:var(--text-dim);">${s.data||''} alle ${s.orario||''}</div>
+          </div>
+        </div>`;
+
+      if (s.uscite) {
+        html += `<div style="background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.25);border-radius:10px;padding:12px;margin-bottom:10px;">
+          <div style="font-weight:700;color:var(--out-color);margin-bottom:6px;">📤 Uscita</div>
+          <div style="font-size:0.85rem;margin-bottom:8px;color:var(--text);">📝 ${escHtml(s.uscite.nota||'—')}</div>
+          <ul style="margin-left:16px;font-size:0.82rem;color:var(--text-dim);">
+            ${(s.uscite.attrezzi||[]).map(a=>`<li>${escHtml(a.nome)} — ${escHtml(a.quantita)}</li>`).join('')}
+          </ul>
+        </div>`;
+      }
+
+      if (s.ingressi) {
+        html += `<div style="background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.25);border-radius:10px;padding:12px;">
+          <div style="font-weight:700;color:var(--in-color);margin-bottom:6px;">📥 Ingresso</div>
+          <div style="font-size:0.85rem;margin-bottom:8px;color:var(--text);">📝 ${escHtml(s.ingressi.nota||'—')}</div>
+          <ul style="margin-left:16px;font-size:0.82rem;color:var(--text-dim);">
+            ${(s.ingressi.attrezzi||[]).map(a=>`<li>${escHtml(a.nome)} — ${escHtml(a.quantita)}</li>`).join('')}
+          </ul>
+        </div>`;
+      }
+
+      html += `</div>`;
+      return html;
+    }).join('');
+  });
+}
+
+function clearSessioni() {
+  if (confirm('Eliminare tutte le sessioni dal promemoria?')) {
+    sessionRef.remove();
+    showToast('🗑 Promemoria svuotato', 'out');
+  }
 }
 
 </script>
@@ -480,6 +590,7 @@ function closeQrScan() {
       <button class="mtab active" onclick="switchTab('attrezzi')">🔧 Attrezzature</button>
       <button class="mtab" onclick="switchTab('persone')">👥 Persone</button>
       <button class="mtab" onclick="switchTab('log')">📋 Log completo</button>
+      <button class="mtab" onclick="switchTab('sessioni')">📝 Promemoria sessioni</button>
     </div>
 
     <!-- TAB ATTREZZATURE -->
@@ -558,6 +669,15 @@ function closeQrScan() {
       </div>
     </div>
 
+    <!-- TAB SESSIONI -->
+    <div class="manager-section" id="tabSessioni">
+      <div class="manager-toolbar">
+        <h3>📝 Promemoria sessioni operatori</h3>
+        <button class="btn-add" style="background:rgba(255,77,109,0.1);border-color:var(--accent2);color:var(--accent2);" onclick="clearSessioni()">🗑 Svuota</button>
+      </div>
+      <div id="sessioniContainer"></div>
+    </div>
+
     <!-- TAB LOG -->
     <div class="manager-section" id="tabLog">
       <div class="manager-toolbar">
@@ -622,6 +742,38 @@ function closeQrScan() {
     </div>
   </div>
 </div>
+
+<!-- ══════════════════ MODAL NOTE SESSIONE ══════════════════ -->
+<div class="modal-overlay" id="modalNote">
+  <div class="modal" style="max-width:520px;">
+    <h3>📝 Note sessione — Logout operatore</h3>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:18px;">Prima di uscire inserisci una nota per i movimenti effettuati.</p>
+
+    <div id="noteOutSection">
+      <div style="background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.3);border-radius:10px;padding:14px;margin-bottom:14px;">
+        <div style="font-weight:700;color:var(--out-color);margin-bottom:8px;">📤 Attrezzi in USCITA</div>
+        <ul id="noteOutList" style="font-size:0.82rem;color:var(--text-dim);margin-left:16px;margin-bottom:10px;"></ul>
+        <div class="form-label" style="margin-bottom:6px;">Motivo uscita *</div>
+        <input class="form-input" id="noteOut" placeholder="es. Intervento via Roma, Addestramento..." style="width:100%;">
+      </div>
+    </div>
+
+    <div id="noteInSection">
+      <div style="background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.3);border-radius:10px;padding:14px;margin-bottom:14px;">
+        <div style="font-weight:700;color:var(--in-color);margin-bottom:8px;">📥 Attrezzi in INGRESSO</div>
+        <ul id="noteInList" style="font-size:0.82rem;color:var(--text-dim);margin-left:16px;margin-bottom:10px;"></ul>
+        <div class="form-label" style="margin-bottom:6px;">Motivo ingresso *</div>
+        <input class="form-input" id="noteIn" placeholder="es. Rientro dall'intervento, Riconsegna..." style="width:100%;">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="confirmLogoutNote()">✅ Salva e logout</button>
+      <button class="btn-cancel" onclick="document.getElementById('modalNote').classList.remove('open')">Annulla</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -659,6 +811,9 @@ let currentFilter = 'all';
 let pendingScan = null;
 let currentAttrezzoId = null;
 let currentPersonaId  = null;
+let sessionMovIn  = [];  // attrezzi entrati in questa sessione
+let sessionMovOut = [];  // attrezzi usciti in questa sessione
+const sessionRef = db.ref('sessioni');
 
 // ── CLOCK ──────────────────────────────────────────────
 function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleTimeString('it-IT',{hour12:false}); }
@@ -743,6 +898,9 @@ window.addEventListener('load', () => {
 
 // ── FIREBASE SYNC ─────────────────────────────────────
 function syncData() {
+  sessionRef.on('value', snap => {
+    renderSessioni();
+  });
   movimentiRef.on('value', snap => {
     const d = snap.val() || {};
     movimenti = Object.values(d).sort((a,b) => (b.ts||0)-(a.ts||0));
@@ -782,10 +940,70 @@ function updateOperatorUI() {
   }
 }
 function logoutOperator() {
+  // Check if there are movements to annotate
+  if (sessionMovIn.length === 0 && sessionMovOut.length === 0) {
+    doLogoutOperator();
+    return;
+  }
+  // Show note modal
+  document.getElementById('noteOutSection').style.display = sessionMovOut.length > 0 ? 'block' : 'none';
+  document.getElementById('noteInSection').style.display  = sessionMovIn.length  > 0 ? 'block' : 'none';
+  document.getElementById('noteOut').value = '';
+  document.getElementById('noteIn').value  = '';
+
+  // List moved items
+  if (sessionMovOut.length > 0) {
+    document.getElementById('noteOutList').innerHTML = sessionMovOut.map(m=>`<li>${escHtml(m.nome)} (${m.quantita})</li>`).join('');
+  }
+  if (sessionMovIn.length > 0) {
+    document.getElementById('noteInList').innerHTML = sessionMovIn.map(m=>`<li>${escHtml(m.nome)} (${m.quantita})</li>`).join('');
+  }
+  document.getElementById('modalNote').classList.add('open');
+}
+
+function doLogoutOperator() {
   currentOperator = null;
   sessionStorage.removeItem('currentOperator');
+  sessionMovIn  = [];
+  sessionMovOut = [];
   updateOperatorUI();
   showToast('👤 Operatore disconnesso', 'out');
+}
+
+function confirmLogoutNote() {
+  const noteOut = document.getElementById('noteOut').value.trim();
+  const noteIn  = document.getElementById('noteIn').value.trim();
+
+  if (sessionMovOut.length > 0 && !noteOut) {
+    showToast('⚠️ Scrivi il motivo per le uscite!', 'out');
+    document.getElementById('noteOut').focus();
+    return;
+  }
+  if (sessionMovIn.length > 0 && !noteIn) {
+    showToast('⚠️ Scrivi il motivo per gli ingressi!', 'out');
+    document.getElementById('noteIn').focus();
+    return;
+  }
+
+  // Save session to Firebase
+  const sessione = {
+    ts: Date.now(),
+    data: today(),
+    orario: new Date().toLocaleTimeString('it-IT'),
+    operatore: currentOperator.nome + ' ' + currentOperator.cognome,
+    operatoreId: currentOperator.id
+  };
+  if (sessionMovOut.length > 0) {
+    sessione.uscite = { nota: noteOut, attrezzi: sessionMovOut };
+  }
+  if (sessionMovIn.length > 0) {
+    sessione.ingressi = { nota: noteIn, attrezzi: sessionMovIn };
+  }
+  sessionRef.push(sessione);
+
+  document.getElementById('modalNote').classList.remove('open');
+  doLogoutOperator();
+  showToast('✅ Sessione salvata!', 'in');
 }
 
 // ── OPERATOR SCAN ─────────────────────────────────────
@@ -936,6 +1154,11 @@ function confirmScan() {
   const timeStr = new Date().toLocaleTimeString('it-IT');
   const dateStr = today();
 
+  // Traccia movimento nella sessione corrente
+  const movEntry = { nome: att.nome, qr: pendingScan.qr, quantita: newQ+'/'+qTot };
+  if (scanMode === 'in') sessionMovIn.push(movEntry);
+  else sessionMovOut.push(movEntry);
+
   // Aggiorna quantità attrezzo
   attrezziRef.child(id).update({qin: newQ});
 
@@ -1072,11 +1295,12 @@ function clearAll() {
 function switchTab(tab) {
   document.querySelectorAll('.mtab').forEach((b,i)=>{ b.classList.remove('active'); });
   document.querySelectorAll('.manager-section').forEach(s=>s.classList.remove('active'));
-  const tabs = ['attrezzi','persone','log'];
+  const tabs = ['attrezzi','persone','log','sessioni'];
   const idx = tabs.indexOf(tab);
   document.querySelectorAll('.mtab')[idx].classList.add('active');
   document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
   if (tab==='log') renderLog();
+  if (tab==='sessioni') renderSessioni();
 }
 
 // ── ATTREZZI ──────────────────────────────────────────
@@ -1319,6 +1543,61 @@ function closeQrScan() {
   document.getElementById('modalQrScan').classList.remove('open');
   scannedQrValue = null;
   qrScanTargetField = null;
+}
+
+
+// ── SESSIONI ──────────────────────────────────────────
+function renderSessioni() {
+  const container = document.getElementById('sessioniContainer');
+  if (!container) return;
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    if (!list.length) {
+      container.innerHTML = `<div class="empty-state">Nessuna sessione registrata.</div>`;
+      return;
+    }
+    container.innerHTML = list.map(([id, s]) => {
+      let html = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+          <div style="font-size:1.3rem">👤</div>
+          <div>
+            <div style="font-weight:800;font-size:1rem;">${escHtml(s.operatore||'—')}</div>
+            <div style="font-size:0.78rem;color:var(--text-dim);">${s.data||''} alle ${s.orario||''}</div>
+          </div>
+        </div>`;
+
+      if (s.uscite) {
+        html += `<div style="background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.25);border-radius:10px;padding:12px;margin-bottom:10px;">
+          <div style="font-weight:700;color:var(--out-color);margin-bottom:6px;">📤 Uscita</div>
+          <div style="font-size:0.85rem;margin-bottom:8px;color:var(--text);">📝 ${escHtml(s.uscite.nota||'—')}</div>
+          <ul style="margin-left:16px;font-size:0.82rem;color:var(--text-dim);">
+            ${(s.uscite.attrezzi||[]).map(a=>`<li>${escHtml(a.nome)} — ${escHtml(a.quantita)}</li>`).join('')}
+          </ul>
+        </div>`;
+      }
+
+      if (s.ingressi) {
+        html += `<div style="background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.25);border-radius:10px;padding:12px;">
+          <div style="font-weight:700;color:var(--in-color);margin-bottom:6px;">📥 Ingresso</div>
+          <div style="font-size:0.85rem;margin-bottom:8px;color:var(--text);">📝 ${escHtml(s.ingressi.nota||'—')}</div>
+          <ul style="margin-left:16px;font-size:0.82rem;color:var(--text-dim);">
+            ${(s.ingressi.attrezzi||[]).map(a=>`<li>${escHtml(a.nome)} — ${escHtml(a.quantita)}</li>`).join('')}
+          </ul>
+        </div>`;
+      }
+
+      html += `</div>`;
+      return html;
+    }).join('');
+  });
+}
+
+function clearSessioni() {
+  if (confirm('Eliminare tutte le sessioni dal promemoria?')) {
+    sessionRef.remove();
+    showToast('🗑 Promemoria svuotato', 'out');
+  }
 }
 
 </script>
