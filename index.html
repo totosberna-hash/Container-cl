@@ -434,11 +434,10 @@ function closeQrScan() {
     <div class="table-panel" style="margin-bottom:20px;">
       <div class="table-toolbar">
         <h2>📦 Stato attrezzature in tempo reale</h2>
-        <input class="search-input" id="searchAppAttrezzi" placeholder="Cerca..." oninput="renderAppAttrezzi()" style="width:160px;">
       </div>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>Attrezzatura</th><th>QR</th><th>Dimensioni</th><th>Container</th><th>Cassa</th><th>Nel container</th><th>Manutenzione</th></tr></thead>
+          <thead><tr><th>Attrezzatura</th><th>QR</th><th>Dimensioni</th><th>Container</th><th>Cassa</th><th>Quantità</th><th>Manutenzione</th></tr></thead>
           <tbody id="appAttrezziBody"><tr><td colspan="7"><div class="empty-state">Nessuna attrezzatura nel catalogo.</div></td></tr></tbody>
         </table>
       </div>
@@ -988,8 +987,7 @@ function flashEffect(type) {
 function renderAppAttrezzi() {
   const tbody = document.getElementById('appAttrezziBody');
   if (!tbody) return;
-  const q = (document.getElementById('searchAppAttrezzi')?.value||'').toLowerCase();
-  const list = Object.entries(attrezzi).filter(([id,a]) => !q || (a.nome||'').toLowerCase().includes(q));
+  const list = Object.entries(attrezzi);
   if (!list.length) {
     tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">Nessuna attrezzatura nel catalogo.</div></td></tr>`;
     return;
@@ -998,17 +996,23 @@ function renderAppAttrezzi() {
     const qin  = parseInt(a.qin)  || 0;
     const qtot = parseInt(a.qtot) || 1;
     const mDue = isMaintenanceDue(a.maintDate);
+    const qColor = qin === qtot ? 'var(--in-color)' : qin === 0 ? 'var(--out-color)' : 'var(--warn-color)';
+    const qLabel = qin === qtot ? '✅ Tutti dentro' : qin === 0 ? '❌ Tutti fuori' : '⚠️ Parziale';
     return `<tr>
       <td><div class="qr-data">${escHtml(a.nome||'—')}</div></td>
       <td><div style="font-size:0.78rem;color:var(--text-dim);word-break:break-word;max-width:180px;">${escHtml(a.qr||'—')}</div></td>
       <td><div style="font-size:0.82rem">${escHtml(a.dim||'—')}</div></td>
-      <td><div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--in-color)">${qin}<span style="font-size:0.75rem;color:var(--text-dim)">/${qtot}</span></div></td>
-      <td><div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:${fuori>0?'var(--out-color)':'var(--text-dim)'}">${fuori}<span style="font-size:0.75rem;color:var(--text-dim)">/${qtot}</span></div></td>
-      <td><span class="tag" style="background:${statoColor}22;color:${statoColor}">${statoLabel}</span></td>
+      <td><div style="font-size:0.88rem;font-weight:700;color:var(--accent3)">${escHtml(a.container||'—')}</div></td>
+      <td><div style="font-size:0.88rem;font-weight:700;color:var(--accent3)">${escHtml(a.cassa||'—')}</div></td>
+      <td>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:800;color:${qColor}">${qin}/${qtot}</div>
+        <div style="font-size:0.72rem;color:var(--text-dim);margin-top:2px;">${qLabel}</div>
+      </td>
       <td>${mDue ? '<span style="color:var(--warn-color);font-weight:700;">🔧 Scaduta</span>' : a.maintDate ? `<span style="font-size:0.8rem;color:var(--text-dim)">${escHtml(a.maintDate)}</span>` : '<span style="color:var(--text-dim)">—</span>'}</td>
     </tr>`;
   }).join('');
 }
+
 
 // ── STATS ─────────────────────────────────────────────
 function updateStats() {
