@@ -205,6 +205,43 @@ function doExportExcel() {
   });
 }
 
+
+// ── CAMBIA PASSWORD ───────────────────────────────────
+async function changePassword(type) {
+  const oldId     = type === 'op' ? 'opPwdOld'     : 'mgPwdOld';
+  const newId     = type === 'op' ? 'opPwdNew'     : 'mgPwdNew';
+  const confirmId = type === 'op' ? 'opPwdConfirm' : 'mgPwdConfirm';
+  const label     = type === 'op' ? 'operatore'    : 'manager';
+
+  const oldVal     = document.getElementById(oldId).value.trim();
+  const newVal     = document.getElementById(newId).value.trim();
+  const confirmVal = document.getElementById(confirmId).value.trim();
+
+  if (!oldVal || !newVal || !confirmVal) { showToast('⚠️ Compila tutti i campi', 'out'); return; }
+  if (newVal !== confirmVal) { showToast('⚠️ Le nuove password non coincidono', 'out'); return; }
+  if (newVal.length < 6) { showToast('⚠️ La password deve essere di almeno 6 caratteri', 'out'); return; }
+
+  const oldHash     = await hashStr(oldVal);
+  const currentHash = type === 'op'
+    ? (window._pwdHashOp || PASSWORD_HASH)
+    : (window._pwdHashMg || MANAGER_HASH);
+
+  if (oldHash !== currentHash) {
+    showToast('❌ Password attuale errata', 'out');
+    document.getElementById(oldId).value = '';
+    document.getElementById(oldId).focus();
+    return;
+  }
+
+  const newHash = await hashStr(newVal);
+  await db.ref('passwords').child(type).set(newHash);
+  if (type === 'op') window._pwdHashOp = newHash;
+  else window._pwdHashMg = newHash;
+
+  [oldId, newId, confirmId].forEach(id => document.getElementById(id).value = '');
+  showToast('✅ Password ' + label + ' aggiornata!', 'in');
+}
+
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
 // ── QR SCAN MANAGER ───────────────────────────────────
@@ -405,6 +442,43 @@ function doExportExcel() {
     document.getElementById('modalFilename').classList.remove('open');
     showToast('📊 Excel scaricato!', 'in');
   });
+}
+
+
+// ── CAMBIA PASSWORD ───────────────────────────────────
+async function changePassword(type) {
+  const oldId     = type === 'op' ? 'opPwdOld'     : 'mgPwdOld';
+  const newId     = type === 'op' ? 'opPwdNew'     : 'mgPwdNew';
+  const confirmId = type === 'op' ? 'opPwdConfirm' : 'mgPwdConfirm';
+  const label     = type === 'op' ? 'operatore'    : 'manager';
+
+  const oldVal     = document.getElementById(oldId).value.trim();
+  const newVal     = document.getElementById(newId).value.trim();
+  const confirmVal = document.getElementById(confirmId).value.trim();
+
+  if (!oldVal || !newVal || !confirmVal) { showToast('⚠️ Compila tutti i campi', 'out'); return; }
+  if (newVal !== confirmVal) { showToast('⚠️ Le nuove password non coincidono', 'out'); return; }
+  if (newVal.length < 6) { showToast('⚠️ La password deve essere di almeno 6 caratteri', 'out'); return; }
+
+  const oldHash     = await hashStr(oldVal);
+  const currentHash = type === 'op'
+    ? (window._pwdHashOp || PASSWORD_HASH)
+    : (window._pwdHashMg || MANAGER_HASH);
+
+  if (oldHash !== currentHash) {
+    showToast('❌ Password attuale errata', 'out');
+    document.getElementById(oldId).value = '';
+    document.getElementById(oldId).focus();
+    return;
+  }
+
+  const newHash = await hashStr(newVal);
+  await db.ref('passwords').child(type).set(newHash);
+  if (type === 'op') window._pwdHashOp = newHash;
+  else window._pwdHashMg = newHash;
+
+  [oldId, newId, confirmId].forEach(id => document.getElementById(id).value = '');
+  showToast('✅ Password ' + label + ' aggiornata!', 'in');
 }
 
 </script>
@@ -681,6 +755,43 @@ function doExportExcel() {
   });
 }
 
+
+// ── CAMBIA PASSWORD ───────────────────────────────────
+async function changePassword(type) {
+  const oldId     = type === 'op' ? 'opPwdOld'     : 'mgPwdOld';
+  const newId     = type === 'op' ? 'opPwdNew'     : 'mgPwdNew';
+  const confirmId = type === 'op' ? 'opPwdConfirm' : 'mgPwdConfirm';
+  const label     = type === 'op' ? 'operatore'    : 'manager';
+
+  const oldVal     = document.getElementById(oldId).value.trim();
+  const newVal     = document.getElementById(newId).value.trim();
+  const confirmVal = document.getElementById(confirmId).value.trim();
+
+  if (!oldVal || !newVal || !confirmVal) { showToast('⚠️ Compila tutti i campi', 'out'); return; }
+  if (newVal !== confirmVal) { showToast('⚠️ Le nuove password non coincidono', 'out'); return; }
+  if (newVal.length < 6) { showToast('⚠️ La password deve essere di almeno 6 caratteri', 'out'); return; }
+
+  const oldHash     = await hashStr(oldVal);
+  const currentHash = type === 'op'
+    ? (window._pwdHashOp || PASSWORD_HASH)
+    : (window._pwdHashMg || MANAGER_HASH);
+
+  if (oldHash !== currentHash) {
+    showToast('❌ Password attuale errata', 'out');
+    document.getElementById(oldId).value = '';
+    document.getElementById(oldId).focus();
+    return;
+  }
+
+  const newHash = await hashStr(newVal);
+  await db.ref('passwords').child(type).set(newHash);
+  if (type === 'op') window._pwdHashOp = newHash;
+  else window._pwdHashMg = newHash;
+
+  [oldId, newId, confirmId].forEach(id => document.getElementById(id).value = '');
+  showToast('✅ Password ' + label + ' aggiornata!', 'in');
+}
+
 </script>
 </head>
 <body>
@@ -838,6 +949,7 @@ function doExportExcel() {
       <button class="mtab" onclick="switchTab('persone')">👥 Persone</button>
       <button class="mtab" onclick="switchTab('log')">📋 Log completo</button>
       <button class="mtab" onclick="switchTab('sessioni')">📝 Promemoria sessioni</button>
+      <button class="mtab" onclick="switchTab('impostazioni')">⚙️ Impostazioni</button>
     </div>
 
     <!-- TAB ATTREZZATURE -->
@@ -923,6 +1035,29 @@ function doExportExcel() {
         <button class="btn-add" style="background:rgba(255,77,109,0.1);border-color:var(--accent2);color:var(--accent2);" onclick="clearSessioni()">🗑 Svuota</button>
       </div>
       <div id="sessioniContainer"></div>
+    </div>
+
+    <!-- TAB IMPOSTAZIONI -->
+    <div class="manager-section" id="tabImpostazioni">
+      <div class="manager-toolbar"><h3>⚙️ Impostazioni password</h3></div>
+      <div class="form-card" style="margin-bottom:16px;">
+        <div style="font-weight:700;font-size:1rem;margin-bottom:16px;color:var(--accent);">🔐 Password app operativa</div>
+        <div class="form-grid">
+          <div class="form-group full"><div class="form-label">Password attuale *</div><input class="form-input" type="password" id="opPwdOld" placeholder="Password attuale"></div>
+          <div class="form-group"><div class="form-label">Nuova password *</div><input class="form-input" type="password" id="opPwdNew" placeholder="Nuova password"></div>
+          <div class="form-group"><div class="form-label">Conferma nuova password *</div><input class="form-input" type="password" id="opPwdConfirm" placeholder="Ripeti nuova password"></div>
+        </div>
+        <div class="form-actions"><button class="btn-save" onclick="changePassword('op')">💾 Cambia password operatore</button></div>
+      </div>
+      <div class="form-card">
+        <div style="font-weight:700;font-size:1rem;margin-bottom:16px;color:#ff6b35;">⚙️ Password manager</div>
+        <div class="form-grid">
+          <div class="form-group full"><div class="form-label">Password attuale *</div><input class="form-input" type="password" id="mgPwdOld" placeholder="Password attuale"></div>
+          <div class="form-group"><div class="form-label">Nuova password *</div><input class="form-input" type="password" id="mgPwdNew" placeholder="Nuova password"></div>
+          <div class="form-group"><div class="form-label">Conferma nuova password *</div><input class="form-input" type="password" id="mgPwdConfirm" placeholder="Ripeti nuova password"></div>
+        </div>
+        <div class="form-actions"><button class="btn-save" style="background:#ff6b35;" onclick="changePassword('mg')">💾 Cambia password manager</button></div>
+      </div>
     </div>
 
     <!-- TAB LOG -->
@@ -1084,7 +1219,9 @@ setInterval(updateClock, 1000); updateClock();
 // ── LOGIN ──────────────────────────────────────────────
 async function checkLogin() {
   const v = document.getElementById('loginInput').value;
-  if ((await hashStr(v)) === PASSWORD_HASH) {
+  const hash = await hashStr(v);
+  const validHash = window._pwdHashOp || PASSWORD_HASH;
+  if (hash === validHash) {
     document.getElementById('loginScreen').style.display = 'none';
     sessionStorage.setItem('loggedInCL','1');
     showApp();
@@ -1104,7 +1241,9 @@ function backToLogin() {
 }
 async function checkManagerLogin() {
   const v = document.getElementById('managerInput').value;
-  if ((await hashStr(v)) === MANAGER_HASH) {
+  const hashMg = await hashStr(v);
+  const validHashMg = window._pwdHashMg || MANAGER_HASH;
+  if (hashMg === validHashMg) {
     document.getElementById('managerLoginScreen').style.display = 'none';
     sessionStorage.setItem('managerLoggedIn','1');
     showManager();
@@ -1160,6 +1299,12 @@ window.addEventListener('load', () => {
 
 // ── FIREBASE SYNC ─────────────────────────────────────
 function syncData() {
+  const pwdRef = db.ref('passwords');
+  pwdRef.on('value', snap => {
+    const d = snap.val() || {};
+    if (d.op) window._pwdHashOp = d.op;
+    if (d.mg) window._pwdHashMg = d.mg;
+  });
   sessionRef.on('value', snap => {
     renderSessioni();
   });
@@ -1557,7 +1702,7 @@ function clearAll() {
 function switchTab(tab) {
   document.querySelectorAll('.mtab').forEach((b,i)=>{ b.classList.remove('active'); });
   document.querySelectorAll('.manager-section').forEach(s=>s.classList.remove('active'));
-  const tabs = ['attrezzi','persone','log','sessioni'];
+  const tabs = ['attrezzi','persone','log','sessioni','impostazioni'];
   const idx = tabs.indexOf(tab);
   document.querySelectorAll('.mtab')[idx].classList.add('active');
   document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
@@ -1942,6 +2087,43 @@ function doExportExcel() {
     document.getElementById('modalFilename').classList.remove('open');
     showToast('📊 Excel scaricato!', 'in');
   });
+}
+
+
+// ── CAMBIA PASSWORD ───────────────────────────────────
+async function changePassword(type) {
+  const oldId     = type === 'op' ? 'opPwdOld'     : 'mgPwdOld';
+  const newId     = type === 'op' ? 'opPwdNew'     : 'mgPwdNew';
+  const confirmId = type === 'op' ? 'opPwdConfirm' : 'mgPwdConfirm';
+  const label     = type === 'op' ? 'operatore'    : 'manager';
+
+  const oldVal     = document.getElementById(oldId).value.trim();
+  const newVal     = document.getElementById(newId).value.trim();
+  const confirmVal = document.getElementById(confirmId).value.trim();
+
+  if (!oldVal || !newVal || !confirmVal) { showToast('⚠️ Compila tutti i campi', 'out'); return; }
+  if (newVal !== confirmVal) { showToast('⚠️ Le nuove password non coincidono', 'out'); return; }
+  if (newVal.length < 6) { showToast('⚠️ La password deve essere di almeno 6 caratteri', 'out'); return; }
+
+  const oldHash     = await hashStr(oldVal);
+  const currentHash = type === 'op'
+    ? (window._pwdHashOp || PASSWORD_HASH)
+    : (window._pwdHashMg || MANAGER_HASH);
+
+  if (oldHash !== currentHash) {
+    showToast('❌ Password attuale errata', 'out');
+    document.getElementById(oldId).value = '';
+    document.getElementById(oldId).focus();
+    return;
+  }
+
+  const newHash = await hashStr(newVal);
+  await db.ref('passwords').child(type).set(newHash);
+  if (type === 'op') window._pwdHashOp = newHash;
+  else window._pwdHashMg = newHash;
+
+  [oldId, newId, confirmId].forEach(id => document.getElementById(id).value = '');
+  showToast('✅ Password ' + label + ' aggiornata!', 'in');
 }
 
 </script>
