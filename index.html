@@ -123,6 +123,88 @@ function clearSessioni() {
   }
 }
 
+
+// ── ESPORTA SESSIONI EXCEL ────────────────────────────
+function esportaSessioniExcel() {
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    if (!list.length) { showToast('Nessuna sessione da esportare', 'out'); return; }
+    // Show filename modal
+    document.getElementById('filenameInput').value = '';
+    document.getElementById('modalFilename').classList.add('open');
+  });
+}
+
+function doExportExcel() {
+  const nome = document.getElementById('filenameInput').value.trim();
+  if (!nome) { showToast('⚠️ Inserisci il nome del file!', 'out'); document.getElementById('filenameInput').focus(); return; }
+
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+
+    const rows = [];
+    rows.push(['Operatore', 'Data', 'Orario', 'Tipo', 'Nota', 'Attrezzatura', 'Quantità']);
+
+    list.forEach(([id, s]) => {
+      const operatore = s.operatore || '—';
+      const data_s    = s.data     || '—';
+      const orario    = s.orario   || '—';
+
+      if (s.uscite) {
+        const nota = s.uscite.nota || '—';
+        const attrezzi = s.uscite.attrezzi || [];
+        if (attrezzi.length === 0) {
+          rows.push([operatore, data_s, orario, 'USCITA', nota, '—', '—']);
+        } else {
+          attrezzi.forEach((a, i) => {
+            rows.push([
+              i===0 ? operatore : '',
+              i===0 ? data_s : '',
+              i===0 ? orario : '',
+              i===0 ? 'USCITA' : '',
+              i===0 ? nota : '',
+              a.nome || '—',
+              a.quantita || '—'
+            ]);
+          });
+        }
+      }
+
+      if (s.ingressi) {
+        const nota = s.ingressi.nota || '—';
+        const attrezzi = s.ingressi.attrezzi || [];
+        if (attrezzi.length === 0) {
+          rows.push([operatore, data_s, orario, 'INGRESSO', nota, '—', '—']);
+        } else {
+          attrezzi.forEach((a, i) => {
+            rows.push([
+              i===0 ? operatore : '',
+              i===0 ? data_s : '',
+              i===0 ? orario : '',
+              i===0 ? 'INGRESSO' : '',
+              i===0 ? nota : '',
+              a.nome || '—',
+              a.quantita || '—'
+            ]);
+          });
+        }
+      }
+      rows.push(['', '', '', '', '', '', '']);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:10},{wch:40},{wch:35},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Promemoria Sessioni');
+    const filename = nome.endsWith('.xlsx') ? nome : nome + '.xlsx';
+    XLSX.writeFile(wb, filename);
+    document.getElementById('modalFilename').classList.remove('open');
+    showToast('📊 Excel scaricato!', 'in');
+  });
+}
+
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
 // ── QR SCAN MANAGER ───────────────────────────────────
@@ -241,6 +323,88 @@ function clearSessioni() {
     sessionRef.remove();
     showToast('🗑 Promemoria svuotato', 'out');
   }
+}
+
+
+// ── ESPORTA SESSIONI EXCEL ────────────────────────────
+function esportaSessioniExcel() {
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    if (!list.length) { showToast('Nessuna sessione da esportare', 'out'); return; }
+    // Show filename modal
+    document.getElementById('filenameInput').value = '';
+    document.getElementById('modalFilename').classList.add('open');
+  });
+}
+
+function doExportExcel() {
+  const nome = document.getElementById('filenameInput').value.trim();
+  if (!nome) { showToast('⚠️ Inserisci il nome del file!', 'out'); document.getElementById('filenameInput').focus(); return; }
+
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+
+    const rows = [];
+    rows.push(['Operatore', 'Data', 'Orario', 'Tipo', 'Nota', 'Attrezzatura', 'Quantità']);
+
+    list.forEach(([id, s]) => {
+      const operatore = s.operatore || '—';
+      const data_s    = s.data     || '—';
+      const orario    = s.orario   || '—';
+
+      if (s.uscite) {
+        const nota = s.uscite.nota || '—';
+        const attrezzi = s.uscite.attrezzi || [];
+        if (attrezzi.length === 0) {
+          rows.push([operatore, data_s, orario, 'USCITA', nota, '—', '—']);
+        } else {
+          attrezzi.forEach((a, i) => {
+            rows.push([
+              i===0 ? operatore : '',
+              i===0 ? data_s : '',
+              i===0 ? orario : '',
+              i===0 ? 'USCITA' : '',
+              i===0 ? nota : '',
+              a.nome || '—',
+              a.quantita || '—'
+            ]);
+          });
+        }
+      }
+
+      if (s.ingressi) {
+        const nota = s.ingressi.nota || '—';
+        const attrezzi = s.ingressi.attrezzi || [];
+        if (attrezzi.length === 0) {
+          rows.push([operatore, data_s, orario, 'INGRESSO', nota, '—', '—']);
+        } else {
+          attrezzi.forEach((a, i) => {
+            rows.push([
+              i===0 ? operatore : '',
+              i===0 ? data_s : '',
+              i===0 ? orario : '',
+              i===0 ? 'INGRESSO' : '',
+              i===0 ? nota : '',
+              a.nome || '—',
+              a.quantita || '—'
+            ]);
+          });
+        }
+      }
+      rows.push(['', '', '', '', '', '', '']);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:10},{wch:40},{wch:35},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Promemoria Sessioni');
+    const filename = nome.endsWith('.xlsx') ? nome : nome + '.xlsx';
+    XLSX.writeFile(wb, filename);
+    document.getElementById('modalFilename').classList.remove('open');
+    showToast('📊 Excel scaricato!', 'in');
+  });
 }
 
 </script>
@@ -435,6 +599,89 @@ function clearSessioni() {
   .log-row { display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(42,42,62,0.5);font-size:0.85rem;align-items:center;flex-wrap:wrap; }
   .log-row:last-child { border-bottom:none; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+// ── ESPORTA SESSIONI EXCEL ────────────────────────────
+function esportaSessioniExcel() {
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    if (!list.length) { showToast('Nessuna sessione da esportare', 'out'); return; }
+    // Show filename modal
+    document.getElementById('filenameInput').value = '';
+    document.getElementById('modalFilename').classList.add('open');
+  });
+}
+
+function doExportExcel() {
+  const nome = document.getElementById('filenameInput').value.trim();
+  if (!nome) { showToast('⚠️ Inserisci il nome del file!', 'out'); document.getElementById('filenameInput').focus(); return; }
+
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+
+    const rows = [];
+    rows.push(['Operatore', 'Data', 'Orario', 'Tipo', 'Nota', 'Attrezzatura', 'Quantità']);
+
+    list.forEach(([id, s]) => {
+      const operatore = s.operatore || '—';
+      const data_s    = s.data     || '—';
+      const orario    = s.orario   || '—';
+
+      if (s.uscite) {
+        const nota = s.uscite.nota || '—';
+        const attrezzi = s.uscite.attrezzi || [];
+        if (attrezzi.length === 0) {
+          rows.push([operatore, data_s, orario, 'USCITA', nota, '—', '—']);
+        } else {
+          attrezzi.forEach((a, i) => {
+            rows.push([
+              i===0 ? operatore : '',
+              i===0 ? data_s : '',
+              i===0 ? orario : '',
+              i===0 ? 'USCITA' : '',
+              i===0 ? nota : '',
+              a.nome || '—',
+              a.quantita || '—'
+            ]);
+          });
+        }
+      }
+
+      if (s.ingressi) {
+        const nota = s.ingressi.nota || '—';
+        const attrezzi = s.ingressi.attrezzi || [];
+        if (attrezzi.length === 0) {
+          rows.push([operatore, data_s, orario, 'INGRESSO', nota, '—', '—']);
+        } else {
+          attrezzi.forEach((a, i) => {
+            rows.push([
+              i===0 ? operatore : '',
+              i===0 ? data_s : '',
+              i===0 ? orario : '',
+              i===0 ? 'INGRESSO' : '',
+              i===0 ? nota : '',
+              a.nome || '—',
+              a.quantita || '—'
+            ]);
+          });
+        }
+      }
+      rows.push(['', '', '', '', '', '', '']);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:10},{wch:40},{wch:35},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Promemoria Sessioni');
+    const filename = nome.endsWith('.xlsx') ? nome : nome + '.xlsx';
+    XLSX.writeFile(wb, filename);
+    document.getElementById('modalFilename').classList.remove('open');
+    showToast('📊 Excel scaricato!', 'in');
+  });
+}
+
+</script>
 </head>
 <body>
 
@@ -739,6 +986,21 @@ function clearSessioni() {
     <div class="modal-actions" style="margin-top:16px;">
       <button class="btn-confirm" id="btnUseQr" style="display:none;" onclick="useScannedQr()">✅ Usa questo QR</button>
       <button class="btn-cancel" onclick="closeQrScan()">✕ Chiudi</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════ MODAL NOME FILE ══════════════════ -->
+<div class="modal-overlay" id="modalFilename">
+  <div class="modal" style="max-width:400px;">
+    <h3>📊 Esporta Excel</h3>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">Inserisci il nome del file da scaricare</p>
+    <input class="form-input" id="filenameInput" placeholder="es. Promemoria_Aprile_2026" style="width:100%;" onkeydown="if(event.key==='Enter') doExportExcel()">
+    <p style="font-size:0.75rem;color:var(--text-dim);margin-top:6px;">L'estensione .xlsx verrà aggiunta automaticamente</p>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn-confirm" onclick="doExportExcel()">📥 Scarica</button>
+      <button class="btn-cancel" onclick="document.getElementById('modalFilename').classList.remove('open')">Annulla</button>
     </div>
   </div>
 </div>
@@ -1598,6 +1860,88 @@ function clearSessioni() {
     sessionRef.remove();
     showToast('🗑 Promemoria svuotato', 'out');
   }
+}
+
+
+// ── ESPORTA SESSIONI EXCEL ────────────────────────────
+function esportaSessioniExcel() {
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    if (!list.length) { showToast('Nessuna sessione da esportare', 'out'); return; }
+    // Show filename modal
+    document.getElementById('filenameInput').value = '';
+    document.getElementById('modalFilename').classList.add('open');
+  });
+}
+
+function doExportExcel() {
+  const nome = document.getElementById('filenameInput').value.trim();
+  if (!nome) { showToast('⚠️ Inserisci il nome del file!', 'out'); document.getElementById('filenameInput').focus(); return; }
+
+  sessionRef.once('value', snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+
+    const rows = [];
+    rows.push(['Operatore', 'Data', 'Orario', 'Tipo', 'Nota', 'Attrezzatura', 'Quantità']);
+
+    list.forEach(([id, s]) => {
+      const operatore = s.operatore || '—';
+      const data_s    = s.data     || '—';
+      const orario    = s.orario   || '—';
+
+      if (s.uscite) {
+        const nota = s.uscite.nota || '—';
+        const attrezzi = s.uscite.attrezzi || [];
+        if (attrezzi.length === 0) {
+          rows.push([operatore, data_s, orario, 'USCITA', nota, '—', '—']);
+        } else {
+          attrezzi.forEach((a, i) => {
+            rows.push([
+              i===0 ? operatore : '',
+              i===0 ? data_s : '',
+              i===0 ? orario : '',
+              i===0 ? 'USCITA' : '',
+              i===0 ? nota : '',
+              a.nome || '—',
+              a.quantita || '—'
+            ]);
+          });
+        }
+      }
+
+      if (s.ingressi) {
+        const nota = s.ingressi.nota || '—';
+        const attrezzi = s.ingressi.attrezzi || [];
+        if (attrezzi.length === 0) {
+          rows.push([operatore, data_s, orario, 'INGRESSO', nota, '—', '—']);
+        } else {
+          attrezzi.forEach((a, i) => {
+            rows.push([
+              i===0 ? operatore : '',
+              i===0 ? data_s : '',
+              i===0 ? orario : '',
+              i===0 ? 'INGRESSO' : '',
+              i===0 ? nota : '',
+              a.nome || '—',
+              a.quantita || '—'
+            ]);
+          });
+        }
+      }
+      rows.push(['', '', '', '', '', '', '']);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:10},{wch:40},{wch:35},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Promemoria Sessioni');
+    const filename = nome.endsWith('.xlsx') ? nome : nome + '.xlsx';
+    XLSX.writeFile(wb, filename);
+    document.getElementById('modalFilename').classList.remove('open');
+    showToast('📊 Excel scaricato!', 'in');
+  });
 }
 
 </script>
