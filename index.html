@@ -128,11 +128,11 @@ function clearSessioni() {
 function esportaSessioniExcel() {
   sessionRef.once('value', snap => {
     const data = snap.val() || {};
-    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    const list = Object.entries(data);
     if (!list.length) { showToast('Nessuna sessione da esportare', 'out'); return; }
-    // Show filename modal
     document.getElementById('filenameInput').value = '';
     document.getElementById('modalFilename').classList.add('open');
+    setTimeout(() => document.getElementById('filenameInput').focus(), 100);
   });
 }
 
@@ -155,7 +155,7 @@ function doExportExcel() {
       if (s.uscite) {
         const nota = s.uscite.nota || '—';
         const attrezzi = s.uscite.attrezzi || [];
-        if (attrezzi.length === 0) {
+        if (!attrezzi.length) {
           rows.push([operatore, data_s, orario, 'USCITA', nota, '—', '—']);
         } else {
           attrezzi.forEach((a, i) => {
@@ -175,7 +175,7 @@ function doExportExcel() {
       if (s.ingressi) {
         const nota = s.ingressi.nota || '—';
         const attrezzi = s.ingressi.attrezzi || [];
-        if (attrezzi.length === 0) {
+        if (!attrezzi.length) {
           rows.push([operatore, data_s, orario, 'INGRESSO', nota, '—', '—']);
         } else {
           attrezzi.forEach((a, i) => {
@@ -196,7 +196,7 @@ function doExportExcel() {
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:10},{wch:40},{wch:35},{wch:12}];
+    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:12},{wch:40},{wch:35},{wch:12}];
     XLSX.utils.book_append_sheet(wb, ws, 'Promemoria Sessioni');
     const filename = nome.endsWith('.xlsx') ? nome : nome + '.xlsx';
     XLSX.writeFile(wb, filename);
@@ -204,44 +204,6 @@ function doExportExcel() {
     showToast('📊 Excel scaricato!', 'in');
   });
 }
-
-
-// ── CAMBIA PASSWORD ───────────────────────────────────
-async function changePassword(type) {
-  const oldId     = type === 'op' ? 'opPwdOld'     : 'mgPwdOld';
-  const newId     = type === 'op' ? 'opPwdNew'     : 'mgPwdNew';
-  const confirmId = type === 'op' ? 'opPwdConfirm' : 'mgPwdConfirm';
-  const label     = type === 'op' ? 'operatore'    : 'manager';
-
-  const oldVal     = document.getElementById(oldId).value.trim();
-  const newVal     = document.getElementById(newId).value.trim();
-  const confirmVal = document.getElementById(confirmId).value.trim();
-
-  if (!oldVal || !newVal || !confirmVal) { showToast('⚠️ Compila tutti i campi', 'out'); return; }
-  if (newVal !== confirmVal) { showToast('⚠️ Le nuove password non coincidono', 'out'); return; }
-  if (newVal.length < 6) { showToast('⚠️ La password deve essere di almeno 6 caratteri', 'out'); return; }
-
-  const oldHash     = await hashStr(oldVal);
-  const currentHash = type === 'op'
-    ? (window._pwdHashOp || PASSWORD_HASH)
-    : (window._pwdHashMg || MANAGER_HASH);
-
-  if (oldHash !== currentHash) {
-    showToast('❌ Password attuale errata', 'out');
-    document.getElementById(oldId).value = '';
-    document.getElementById(oldId).focus();
-    return;
-  }
-
-  const newHash = await hashStr(newVal);
-  await db.ref('passwords').child(type).set(newHash);
-  if (type === 'op') window._pwdHashOp = newHash;
-  else window._pwdHashMg = newHash;
-
-  [oldId, newId, confirmId].forEach(id => document.getElementById(id).value = '');
-  showToast('✅ Password ' + label + ' aggiornata!', 'in');
-}
-
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
 // ── QR SCAN MANAGER ───────────────────────────────────
@@ -367,11 +329,11 @@ function clearSessioni() {
 function esportaSessioniExcel() {
   sessionRef.once('value', snap => {
     const data = snap.val() || {};
-    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    const list = Object.entries(data);
     if (!list.length) { showToast('Nessuna sessione da esportare', 'out'); return; }
-    // Show filename modal
     document.getElementById('filenameInput').value = '';
     document.getElementById('modalFilename').classList.add('open');
+    setTimeout(() => document.getElementById('filenameInput').focus(), 100);
   });
 }
 
@@ -394,7 +356,7 @@ function doExportExcel() {
       if (s.uscite) {
         const nota = s.uscite.nota || '—';
         const attrezzi = s.uscite.attrezzi || [];
-        if (attrezzi.length === 0) {
+        if (!attrezzi.length) {
           rows.push([operatore, data_s, orario, 'USCITA', nota, '—', '—']);
         } else {
           attrezzi.forEach((a, i) => {
@@ -414,7 +376,7 @@ function doExportExcel() {
       if (s.ingressi) {
         const nota = s.ingressi.nota || '—';
         const attrezzi = s.ingressi.attrezzi || [];
-        if (attrezzi.length === 0) {
+        if (!attrezzi.length) {
           rows.push([operatore, data_s, orario, 'INGRESSO', nota, '—', '—']);
         } else {
           attrezzi.forEach((a, i) => {
@@ -435,7 +397,7 @@ function doExportExcel() {
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:10},{wch:40},{wch:35},{wch:12}];
+    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:12},{wch:40},{wch:35},{wch:12}];
     XLSX.utils.book_append_sheet(wb, ws, 'Promemoria Sessioni');
     const filename = nome.endsWith('.xlsx') ? nome : nome + '.xlsx';
     XLSX.writeFile(wb, filename);
@@ -443,44 +405,6 @@ function doExportExcel() {
     showToast('📊 Excel scaricato!', 'in');
   });
 }
-
-
-// ── CAMBIA PASSWORD ───────────────────────────────────
-async function changePassword(type) {
-  const oldId     = type === 'op' ? 'opPwdOld'     : 'mgPwdOld';
-  const newId     = type === 'op' ? 'opPwdNew'     : 'mgPwdNew';
-  const confirmId = type === 'op' ? 'opPwdConfirm' : 'mgPwdConfirm';
-  const label     = type === 'op' ? 'operatore'    : 'manager';
-
-  const oldVal     = document.getElementById(oldId).value.trim();
-  const newVal     = document.getElementById(newId).value.trim();
-  const confirmVal = document.getElementById(confirmId).value.trim();
-
-  if (!oldVal || !newVal || !confirmVal) { showToast('⚠️ Compila tutti i campi', 'out'); return; }
-  if (newVal !== confirmVal) { showToast('⚠️ Le nuove password non coincidono', 'out'); return; }
-  if (newVal.length < 6) { showToast('⚠️ La password deve essere di almeno 6 caratteri', 'out'); return; }
-
-  const oldHash     = await hashStr(oldVal);
-  const currentHash = type === 'op'
-    ? (window._pwdHashOp || PASSWORD_HASH)
-    : (window._pwdHashMg || MANAGER_HASH);
-
-  if (oldHash !== currentHash) {
-    showToast('❌ Password attuale errata', 'out');
-    document.getElementById(oldId).value = '';
-    document.getElementById(oldId).focus();
-    return;
-  }
-
-  const newHash = await hashStr(newVal);
-  await db.ref('passwords').child(type).set(newHash);
-  if (type === 'op') window._pwdHashOp = newHash;
-  else window._pwdHashMg = newHash;
-
-  [oldId, newId, confirmId].forEach(id => document.getElementById(id).value = '');
-  showToast('✅ Password ' + label + ' aggiornata!', 'in');
-}
-
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -678,11 +602,11 @@ async function changePassword(type) {
 function esportaSessioniExcel() {
   sessionRef.once('value', snap => {
     const data = snap.val() || {};
-    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    const list = Object.entries(data);
     if (!list.length) { showToast('Nessuna sessione da esportare', 'out'); return; }
-    // Show filename modal
     document.getElementById('filenameInput').value = '';
     document.getElementById('modalFilename').classList.add('open');
+    setTimeout(() => document.getElementById('filenameInput').focus(), 100);
   });
 }
 
@@ -705,7 +629,7 @@ function doExportExcel() {
       if (s.uscite) {
         const nota = s.uscite.nota || '—';
         const attrezzi = s.uscite.attrezzi || [];
-        if (attrezzi.length === 0) {
+        if (!attrezzi.length) {
           rows.push([operatore, data_s, orario, 'USCITA', nota, '—', '—']);
         } else {
           attrezzi.forEach((a, i) => {
@@ -725,7 +649,7 @@ function doExportExcel() {
       if (s.ingressi) {
         const nota = s.ingressi.nota || '—';
         const attrezzi = s.ingressi.attrezzi || [];
-        if (attrezzi.length === 0) {
+        if (!attrezzi.length) {
           rows.push([operatore, data_s, orario, 'INGRESSO', nota, '—', '—']);
         } else {
           attrezzi.forEach((a, i) => {
@@ -746,7 +670,7 @@ function doExportExcel() {
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:10},{wch:40},{wch:35},{wch:12}];
+    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:12},{wch:40},{wch:35},{wch:12}];
     XLSX.utils.book_append_sheet(wb, ws, 'Promemoria Sessioni');
     const filename = nome.endsWith('.xlsx') ? nome : nome + '.xlsx';
     XLSX.writeFile(wb, filename);
@@ -754,44 +678,6 @@ function doExportExcel() {
     showToast('📊 Excel scaricato!', 'in');
   });
 }
-
-
-// ── CAMBIA PASSWORD ───────────────────────────────────
-async function changePassword(type) {
-  const oldId     = type === 'op' ? 'opPwdOld'     : 'mgPwdOld';
-  const newId     = type === 'op' ? 'opPwdNew'     : 'mgPwdNew';
-  const confirmId = type === 'op' ? 'opPwdConfirm' : 'mgPwdConfirm';
-  const label     = type === 'op' ? 'operatore'    : 'manager';
-
-  const oldVal     = document.getElementById(oldId).value.trim();
-  const newVal     = document.getElementById(newId).value.trim();
-  const confirmVal = document.getElementById(confirmId).value.trim();
-
-  if (!oldVal || !newVal || !confirmVal) { showToast('⚠️ Compila tutti i campi', 'out'); return; }
-  if (newVal !== confirmVal) { showToast('⚠️ Le nuove password non coincidono', 'out'); return; }
-  if (newVal.length < 6) { showToast('⚠️ La password deve essere di almeno 6 caratteri', 'out'); return; }
-
-  const oldHash     = await hashStr(oldVal);
-  const currentHash = type === 'op'
-    ? (window._pwdHashOp || PASSWORD_HASH)
-    : (window._pwdHashMg || MANAGER_HASH);
-
-  if (oldHash !== currentHash) {
-    showToast('❌ Password attuale errata', 'out');
-    document.getElementById(oldId).value = '';
-    document.getElementById(oldId).focus();
-    return;
-  }
-
-  const newHash = await hashStr(newVal);
-  await db.ref('passwords').child(type).set(newHash);
-  if (type === 'op') window._pwdHashOp = newHash;
-  else window._pwdHashMg = newHash;
-
-  [oldId, newId, confirmId].forEach(id => document.getElementById(id).value = '');
-  showToast('✅ Password ' + label + ' aggiornata!', 'in');
-}
-
 </script>
 </head>
 <body>
@@ -949,7 +835,6 @@ async function changePassword(type) {
       <button class="mtab" onclick="switchTab('persone')">👥 Persone</button>
       <button class="mtab" onclick="switchTab('log')">📋 Log completo</button>
       <button class="mtab" onclick="switchTab('sessioni')">📝 Promemoria sessioni</button>
-      <button class="mtab" onclick="switchTab('impostazioni')">⚙️ Impostazioni</button>
     </div>
 
     <!-- TAB ATTREZZATURE -->
@@ -1032,32 +917,10 @@ async function changePassword(type) {
     <div class="manager-section" id="tabSessioni">
       <div class="manager-toolbar">
         <h3>📝 Promemoria sessioni operatori</h3>
+        <button class="btn-add" onclick="esportaSessioniExcel()">📊 Esporta Excel</button>
         <button class="btn-add" style="background:rgba(255,77,109,0.1);border-color:var(--accent2);color:var(--accent2);" onclick="clearSessioni()">🗑 Svuota</button>
       </div>
       <div id="sessioniContainer"></div>
-    </div>
-
-    <!-- TAB IMPOSTAZIONI -->
-    <div class="manager-section" id="tabImpostazioni">
-      <div class="manager-toolbar"><h3>⚙️ Impostazioni password</h3></div>
-      <div class="form-card" style="margin-bottom:16px;">
-        <div style="font-weight:700;font-size:1rem;margin-bottom:16px;color:var(--accent);">🔐 Password app operativa</div>
-        <div class="form-grid">
-          <div class="form-group full"><div class="form-label">Password attuale *</div><input class="form-input" type="password" id="opPwdOld" placeholder="Password attuale"></div>
-          <div class="form-group"><div class="form-label">Nuova password *</div><input class="form-input" type="password" id="opPwdNew" placeholder="Nuova password"></div>
-          <div class="form-group"><div class="form-label">Conferma nuova password *</div><input class="form-input" type="password" id="opPwdConfirm" placeholder="Ripeti nuova password"></div>
-        </div>
-        <div class="form-actions"><button class="btn-save" onclick="changePassword('op')">💾 Cambia password operatore</button></div>
-      </div>
-      <div class="form-card">
-        <div style="font-weight:700;font-size:1rem;margin-bottom:16px;color:#ff6b35;">⚙️ Password manager</div>
-        <div class="form-grid">
-          <div class="form-group full"><div class="form-label">Password attuale *</div><input class="form-input" type="password" id="mgPwdOld" placeholder="Password attuale"></div>
-          <div class="form-group"><div class="form-label">Nuova password *</div><input class="form-input" type="password" id="mgPwdNew" placeholder="Nuova password"></div>
-          <div class="form-group"><div class="form-label">Conferma nuova password *</div><input class="form-input" type="password" id="mgPwdConfirm" placeholder="Ripeti nuova password"></div>
-        </div>
-        <div class="form-actions"><button class="btn-save" style="background:#ff6b35;" onclick="changePassword('mg')">💾 Cambia password manager</button></div>
-      </div>
     </div>
 
     <!-- TAB LOG -->
@@ -1125,21 +988,6 @@ async function changePassword(type) {
   </div>
 </div>
 
-
-<!-- ══════════════════ MODAL NOME FILE ══════════════════ -->
-<div class="modal-overlay" id="modalFilename">
-  <div class="modal" style="max-width:400px;">
-    <h3>📊 Esporta Excel</h3>
-    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">Inserisci il nome del file da scaricare</p>
-    <input class="form-input" id="filenameInput" placeholder="es. Promemoria_Aprile_2026" style="width:100%;" onkeydown="if(event.key==='Enter') doExportExcel()">
-    <p style="font-size:0.75rem;color:var(--text-dim);margin-top:6px;">L'estensione .xlsx verrà aggiunta automaticamente</p>
-    <div class="modal-actions" style="margin-top:16px;">
-      <button class="btn-confirm" onclick="doExportExcel()">📥 Scarica</button>
-      <button class="btn-cancel" onclick="document.getElementById('modalFilename').classList.remove('open')">Annulla</button>
-    </div>
-  </div>
-</div>
-
 <!-- ══════════════════ MODAL NOTE SESSIONE ══════════════════ -->
 <div class="modal-overlay" id="modalNote">
   <div class="modal" style="max-width:520px;">
@@ -1167,6 +1015,21 @@ async function changePassword(type) {
     <div class="modal-actions">
       <button class="btn-confirm" onclick="confirmLogoutNote()">✅ Salva e logout</button>
       <button class="btn-cancel" onclick="document.getElementById('modalNote').classList.remove('open')">Annulla</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════ MODAL NOME FILE ══════════════════ -->
+<div class="modal-overlay" id="modalFilename">
+  <div class="modal" style="max-width:400px;">
+    <h3>📊 Esporta Excel</h3>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">Inserisci il nome del file da scaricare</p>
+    <input class="form-input" id="filenameInput" placeholder="es. Promemoria_Aprile_2026" style="width:100%;" onkeydown="if(event.key==='Enter') doExportExcel()">
+    <p style="font-size:0.75rem;color:var(--text-dim);margin-top:6px;">L'estensione .xlsx verrà aggiunta automaticamente</p>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn-confirm" onclick="doExportExcel()">📥 Scarica</button>
+      <button class="btn-cancel" onclick="document.getElementById('modalFilename').classList.remove('open')">Annulla</button>
     </div>
   </div>
 </div>
@@ -1219,9 +1082,7 @@ setInterval(updateClock, 1000); updateClock();
 // ── LOGIN ──────────────────────────────────────────────
 async function checkLogin() {
   const v = document.getElementById('loginInput').value;
-  const hash = await hashStr(v);
-  const validHash = window._pwdHashOp || PASSWORD_HASH;
-  if (hash === validHash) {
+  if ((await hashStr(v)) === PASSWORD_HASH) {
     document.getElementById('loginScreen').style.display = 'none';
     sessionStorage.setItem('loggedInCL','1');
     showApp();
@@ -1241,9 +1102,7 @@ function backToLogin() {
 }
 async function checkManagerLogin() {
   const v = document.getElementById('managerInput').value;
-  const hashMg = await hashStr(v);
-  const validHashMg = window._pwdHashMg || MANAGER_HASH;
-  if (hashMg === validHashMg) {
+  if ((await hashStr(v)) === MANAGER_HASH) {
     document.getElementById('managerLoginScreen').style.display = 'none';
     sessionStorage.setItem('managerLoggedIn','1');
     showManager();
@@ -1299,12 +1158,6 @@ window.addEventListener('load', () => {
 
 // ── FIREBASE SYNC ─────────────────────────────────────
 function syncData() {
-  const pwdRef = db.ref('passwords');
-  pwdRef.on('value', snap => {
-    const d = snap.val() || {};
-    if (d.op) window._pwdHashOp = d.op;
-    if (d.mg) window._pwdHashMg = d.mg;
-  });
   sessionRef.on('value', snap => {
     renderSessioni();
   });
@@ -1702,7 +1555,7 @@ function clearAll() {
 function switchTab(tab) {
   document.querySelectorAll('.mtab').forEach((b,i)=>{ b.classList.remove('active'); });
   document.querySelectorAll('.manager-section').forEach(s=>s.classList.remove('active'));
-  const tabs = ['attrezzi','persone','log','sessioni','impostazioni'];
+  const tabs = ['attrezzi','persone','log','sessioni'];
   const idx = tabs.indexOf(tab);
   document.querySelectorAll('.mtab')[idx].classList.add('active');
   document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
@@ -2012,11 +1865,11 @@ function clearSessioni() {
 function esportaSessioniExcel() {
   sessionRef.once('value', snap => {
     const data = snap.val() || {};
-    const list = Object.entries(data).sort((a,b) => (b[1].ts||0)-(a[1].ts||0));
+    const list = Object.entries(data);
     if (!list.length) { showToast('Nessuna sessione da esportare', 'out'); return; }
-    // Show filename modal
     document.getElementById('filenameInput').value = '';
     document.getElementById('modalFilename').classList.add('open');
+    setTimeout(() => document.getElementById('filenameInput').focus(), 100);
   });
 }
 
@@ -2039,7 +1892,7 @@ function doExportExcel() {
       if (s.uscite) {
         const nota = s.uscite.nota || '—';
         const attrezzi = s.uscite.attrezzi || [];
-        if (attrezzi.length === 0) {
+        if (!attrezzi.length) {
           rows.push([operatore, data_s, orario, 'USCITA', nota, '—', '—']);
         } else {
           attrezzi.forEach((a, i) => {
@@ -2059,7 +1912,7 @@ function doExportExcel() {
       if (s.ingressi) {
         const nota = s.ingressi.nota || '—';
         const attrezzi = s.ingressi.attrezzi || [];
-        if (attrezzi.length === 0) {
+        if (!attrezzi.length) {
           rows.push([operatore, data_s, orario, 'INGRESSO', nota, '—', '—']);
         } else {
           attrezzi.forEach((a, i) => {
@@ -2080,7 +1933,7 @@ function doExportExcel() {
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:10},{wch:40},{wch:35},{wch:12}];
+    ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:12},{wch:40},{wch:35},{wch:12}];
     XLSX.utils.book_append_sheet(wb, ws, 'Promemoria Sessioni');
     const filename = nome.endsWith('.xlsx') ? nome : nome + '.xlsx';
     XLSX.writeFile(wb, filename);
@@ -2088,44 +1941,6 @@ function doExportExcel() {
     showToast('📊 Excel scaricato!', 'in');
   });
 }
-
-
-// ── CAMBIA PASSWORD ───────────────────────────────────
-async function changePassword(type) {
-  const oldId     = type === 'op' ? 'opPwdOld'     : 'mgPwdOld';
-  const newId     = type === 'op' ? 'opPwdNew'     : 'mgPwdNew';
-  const confirmId = type === 'op' ? 'opPwdConfirm' : 'mgPwdConfirm';
-  const label     = type === 'op' ? 'operatore'    : 'manager';
-
-  const oldVal     = document.getElementById(oldId).value.trim();
-  const newVal     = document.getElementById(newId).value.trim();
-  const confirmVal = document.getElementById(confirmId).value.trim();
-
-  if (!oldVal || !newVal || !confirmVal) { showToast('⚠️ Compila tutti i campi', 'out'); return; }
-  if (newVal !== confirmVal) { showToast('⚠️ Le nuove password non coincidono', 'out'); return; }
-  if (newVal.length < 6) { showToast('⚠️ La password deve essere di almeno 6 caratteri', 'out'); return; }
-
-  const oldHash     = await hashStr(oldVal);
-  const currentHash = type === 'op'
-    ? (window._pwdHashOp || PASSWORD_HASH)
-    : (window._pwdHashMg || MANAGER_HASH);
-
-  if (oldHash !== currentHash) {
-    showToast('❌ Password attuale errata', 'out');
-    document.getElementById(oldId).value = '';
-    document.getElementById(oldId).focus();
-    return;
-  }
-
-  const newHash = await hashStr(newVal);
-  await db.ref('passwords').child(type).set(newHash);
-  if (type === 'op') window._pwdHashOp = newHash;
-  else window._pwdHashMg = newHash;
-
-  [oldId, newId, confirmId].forEach(id => document.getElementById(id).value = '');
-  showToast('✅ Password ' + label + ' aggiornata!', 'in');
-}
-
 </script>
 </body>
 </html>
