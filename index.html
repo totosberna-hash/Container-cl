@@ -1949,6 +1949,21 @@ function flashEffect(type) {
 
 
 // ── RIEPILOGO ATTREZZATURE IN APP ─────────────────────
+
+function getFuoriUsoCell(a, fuoriUso) {
+  let html = '<div><span style="color:#ff4d4d;font-weight:700;">🔴 ' + fuoriUso + ' pz</span>';
+  if (a.fuoriUsoLog) {
+    const lastLog = Object.values(a.fuoriUsoLog).sort((x,y)=>(y.ts||0)-(x.ts||0))[0];
+    if (lastLog) {
+      html += '<div style="font-size:0.72rem;color:var(--text-dim);margin-top:2px;">' + (lastLog.data||'') + '</div>';
+      html += '<div style="font-size:0.72rem;color:var(--text-dim);">' + escHtml(lastLog.motivo||'') + '</div>';
+      html += '<div style="font-size:0.72rem;color:var(--text-dim);">' + escHtml(lastLog.operatore||'') + '</div>';
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
 function renderAppAttrezzi() {
   const tbody = document.getElementById('appAttrezziBody');
   if (!tbody) return;
