@@ -302,7 +302,7 @@ function renderAttrezzi() {
         <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:800;color:${qColor}">${qin}/${qtot}</div>
         <div style="font-size:0.72rem;color:var(--text-dim);margin-top:2px;">${qLabel}</div>
       </td>
-      <td>${fuoriUso>0 ? getViewerFuoriUsoCell(a, fuoriUso) : '<span style="color:var(--text-dim)">—</span>'v><div style="font-size:0.72rem;color:var(--text-dim);">${escHtml(Object.values(a.fuoriUsoLog).sort((x,y)=>(y.ts||0)-(x.ts||0))[0]?.operatore||'')}</div>`:''}` :'<span style="color:var(--text-dim)">—</span>'}</td>
+      <td>${fuoriUso>0 ? getViewerFuoriUsoCell(a, fuoriUso) : '<span style="color:var(--text-dim)">—</span>'}</td>
       <td>${mDue?'<span style="color:var(--warn-color);font-weight:700;">🔧 Scaduta</span>':a.maintDate?`<span style="font-size:0.8rem;color:var(--text-dim)">${escHtml(a.maintDate)}</span>`:'<span style="color:var(--text-dim)">—</span>'}</td>
     </tr>`;
   }).join('');
