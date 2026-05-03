@@ -4,8 +4,84 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Container CL — Viewer</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+// ── FUORI USO VIEWER ──────────────────────────────────
+function renderFuoriUsoViewer() {
+  const container = document.getElementById('fuoriUsoViewerContainer');
+  if (!container) return;
+  const listAll = Object.entries(attrezzi).filter(function(e){ return e[1].fuoriUsoLog; });
+  if (!listAll.length) {
+    container.innerHTML = '<div class="empty-state">Nessun evento fuori uso registrato.</div>';
+    return;
+  }
+  container.innerHTML = listAll.map(function(entry) {
+    const id = entry[0], a = entry[1];
+    const logs = Object.entries(a.fuoriUsoLog).sort(function(x,y){ return (y[1].ts||0)-(x[1].ts||0); });
+    const fuoriUso = parseInt(a.fuoriUso)||0;
+    return '<div class="sessione-card">' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">' +
+        '<div style="font-size:1.3rem">🔩</div>' +
+        '<div style="flex:1;">' +
+          '<div style="font-weight:800;font-size:1rem;">' + escHtml(a.nome||'—') + (fuoriUso>0?' <span style="color:#ff4d4d;">🔴 '+fuoriUso+' fuori uso</span>':'') + '</div>' +
+          '<div style="font-size:0.78rem;color:var(--text-dim);">Totale: ' + (a.qtot||0) + ' pz</div>' +
+        '</div>' +
+      '</div>' +
+      logs.map(function(e2) {
+        const log = e2[1];
+        return '<div style="background:' + (log.delta>0?'rgba(255,77,77,0.08)':'rgba(0,229,160,0.08)') + ';border:1px solid ' + (log.delta>0?'rgba(255,77,77,0.25)':'rgba(0,229,160,0.25)') + ';border-radius:10px;padding:12px;margin-bottom:8px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+            '<span>' + (log.delta>0?'🔴':'✅') + '</span>' +
+            '<span style="font-weight:700;color:' + (log.delta>0?'#ff4d4d':'var(--in-color)') + ';">' + (log.delta>0?'Fuori uso':'Ripristinato') + ' (' + (log.delta>0?'+':'') + log.delta + ' pz)</span>' +
+            '<span style="font-size:0.78rem;color:var(--text-dim);margin-left:auto;">' + (log.data||'') + ' ' + (log.orario||'') + '</span>' +
+          '</div>' +
+          '<div style="margin-top:6px;font-size:0.85rem;">📝 ' + escHtml(log.motivo||'—') + '</div>' +
+          '<div style="margin-top:3px;font-size:0.78rem;color:var(--text-dim);">👤 ' + escHtml(log.operatore||'—') + '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
+// ── FUORI USO VIEWER ──────────────────────────────────
+function renderFuoriUsoViewer() {
+  const container = document.getElementById('fuoriUsoViewerContainer');
+  if (!container) return;
+  const listAll = Object.entries(attrezzi).filter(function(e){ return e[1].fuoriUsoLog; });
+  if (!listAll.length) {
+    container.innerHTML = '<div class="empty-state">Nessun evento fuori uso registrato.</div>';
+    return;
+  }
+  container.innerHTML = listAll.map(function(entry) {
+    const id = entry[0], a = entry[1];
+    const logs = Object.entries(a.fuoriUsoLog).sort(function(x,y){ return (y[1].ts||0)-(x[1].ts||0); });
+    const fuoriUso = parseInt(a.fuoriUso)||0;
+    return '<div class="sessione-card">' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">' +
+        '<div style="font-size:1.3rem">🔩</div>' +
+        '<div style="flex:1;">' +
+          '<div style="font-weight:800;font-size:1rem;">' + escHtml(a.nome||'—') + (fuoriUso>0?' <span style="color:#ff4d4d;">🔴 '+fuoriUso+' fuori uso</span>':'') + '</div>' +
+          '<div style="font-size:0.78rem;color:var(--text-dim);">Totale: ' + (a.qtot||0) + ' pz</div>' +
+        '</div>' +
+      '</div>' +
+      logs.map(function(e2) {
+        const log = e2[1];
+        return '<div style="background:' + (log.delta>0?'rgba(255,77,77,0.08)':'rgba(0,229,160,0.08)') + ';border:1px solid ' + (log.delta>0?'rgba(255,77,77,0.25)':'rgba(0,229,160,0.25)') + ';border-radius:10px;padding:12px;margin-bottom:8px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+            '<span>' + (log.delta>0?'🔴':'✅') + '</span>' +
+            '<span style="font-weight:700;color:' + (log.delta>0?'#ff4d4d':'var(--in-color)') + ';">' + (log.delta>0?'Fuori uso':'Ripristinato') + ' (' + (log.delta>0?'+':'') + log.delta + ' pz)</span>' +
+            '<span style="font-size:0.78rem;color:var(--text-dim);margin-left:auto;">' + (log.data||'') + ' ' + (log.orario||'') + '</span>' +
+          '</div>' +
+          '<div style="margin-top:6px;font-size:0.85rem;">📝 ' + escHtml(log.motivo||'—') + '</div>' +
+          '<div style="margin-top:3px;font-size:0.78rem;color:var(--text-dim);">👤 ' + escHtml(log.operatore||'—') + '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -130,6 +206,7 @@
       <button class="tab active" onclick="switchTab('attrezzi')">📦 Stato attrezzature</button>
       <button class="tab" onclick="switchTab('movimenti')">📋 Movimenti</button>
       <button class="tab" onclick="switchTab('sessioni')">📝 Promemoria</button>
+      <button class="tab" onclick="switchTab('fuoriuso')">🔴 Fuori Uso</button>
     </div>
 
     <!-- TAB ATTREZZATURE -->
@@ -379,6 +456,7 @@ function switchTab(tab) {
   document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
   const tabs = ['attrezzi','movimenti','sessioni'];
   document.querySelectorAll('.tabs .tab')[tabs.indexOf(tab)].classList.add('active');
+  if (tab==='fuoriuso') renderFuoriUsoViewer();
 }
 
 function showToast(msg) {
@@ -395,6 +473,44 @@ window.addEventListener('load', () => {
     startSync();
   }
 });
+
+// ── FUORI USO VIEWER ──────────────────────────────────
+function renderFuoriUsoViewer() {
+  const container = document.getElementById('fuoriUsoViewerContainer');
+  if (!container) return;
+  const listAll = Object.entries(attrezzi).filter(function(e){ return e[1].fuoriUsoLog; });
+  if (!listAll.length) {
+    container.innerHTML = '<div class="empty-state">Nessun evento fuori uso registrato.</div>';
+    return;
+  }
+  container.innerHTML = listAll.map(function(entry) {
+    const id = entry[0], a = entry[1];
+    const logs = Object.entries(a.fuoriUsoLog).sort(function(x,y){ return (y[1].ts||0)-(x[1].ts||0); });
+    const fuoriUso = parseInt(a.fuoriUso)||0;
+    return '<div class="sessione-card">' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">' +
+        '<div style="font-size:1.3rem">🔩</div>' +
+        '<div style="flex:1;">' +
+          '<div style="font-weight:800;font-size:1rem;">' + escHtml(a.nome||'—') + (fuoriUso>0?' <span style="color:#ff4d4d;">🔴 '+fuoriUso+' fuori uso</span>':'') + '</div>' +
+          '<div style="font-size:0.78rem;color:var(--text-dim);">Totale: ' + (a.qtot||0) + ' pz</div>' +
+        '</div>' +
+      '</div>' +
+      logs.map(function(e2) {
+        const log = e2[1];
+        return '<div style="background:' + (log.delta>0?'rgba(255,77,77,0.08)':'rgba(0,229,160,0.08)') + ';border:1px solid ' + (log.delta>0?'rgba(255,77,77,0.25)':'rgba(0,229,160,0.25)') + ';border-radius:10px;padding:12px;margin-bottom:8px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+            '<span>' + (log.delta>0?'🔴':'✅') + '</span>' +
+            '<span style="font-weight:700;color:' + (log.delta>0?'#ff4d4d':'var(--in-color)') + ';">' + (log.delta>0?'Fuori uso':'Ripristinato') + ' (' + (log.delta>0?'+':'') + log.delta + ' pz)</span>' +
+            '<span style="font-size:0.78rem;color:var(--text-dim);margin-left:auto;">' + (log.data||'') + ' ' + (log.orario||'') + '</span>' +
+          '</div>' +
+          '<div style="margin-top:6px;font-size:0.85rem;">📝 ' + escHtml(log.motivo||'—') + '</div>' +
+          '<div style="margin-top:3px;font-size:0.78rem;color:var(--text-dim);">👤 ' + escHtml(log.operatore||'—') + '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+
 </script>
 </body>
 </html>
