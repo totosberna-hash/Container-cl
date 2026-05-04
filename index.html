@@ -426,6 +426,7 @@ function doExportFuoriUsoExcel() {
 
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
+<script src="app-core.js"></script>
 // ── QR SCAN MANAGER ───────────────────────────────────
 let qrScanTargetField = null;
 let scanningQrManager = false;
@@ -1791,13 +1792,7 @@ function doExportFuoriUsoExcel() {
 <div class="toast" id="toast"></div>
 
 <script>
-// ── FIREBASE ───────────────────────────────────────────
-const firebaseConfig = { databaseURL: "https://container-cl-default-rtdb.europe-west1.firebasedatabase.app/" };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const movimentiRef = db.ref('movimenti');
-const attrezziRef  = db.ref('attrezzi');
-const personeRef   = db.ref('persone');
+
 
 // ── HASH ───────────────────────────────────────────────
 const PASSWORD_HASH  = "bb3f44f6b9189303fb0df0f6cadd6b9779060f8f252098e8f19d9d53509b32ea";
