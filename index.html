@@ -789,7 +789,13 @@ function syncData() {
     movimenti = Object.values(d).sort((a,b) => (b.ts||0)-(a.ts||0));
     renderTable(); renderLog(); updateStats();
   });
-  attrezziRef.on('value', snap => { attrezzi = snap.val() || {}; renderAttrezzi(); renderAppAttrezzi(); updateStats(); });
+  attrezziRef.on('value', snap => {
+    attrezzi = snap.val() || {};
+    renderAttrezzi(); renderAppAttrezzi(); updateStats();
+    // Aggiorna promemoria fuori uso se il tab è aperto
+    const tabFU = document.getElementById('tabFuoriuso');
+    if (tabFU && tabFU.classList.contains('active')) renderFuoriUsoPromemoria();
+  });
   personeRef.on('value',  snap => { persone  = snap.val() || {}; renderPersone(); });
 }
 
@@ -1747,11 +1753,9 @@ function changeFuoriUso(id, delta) {
 function renderFuoriUsoPromemoria() {
   const container = document.getElementById('fuoriUsoPromemoriaContainer');
   if (!container) return;
-  container.innerHTML = '<div class="empty-state" style="padding:20px;">Caricamento...</div>';
-  attrezziRef.once('value', function(snap) {
-    const data = snap.val() || {};
-    const listAll = Object.entries(data).filter(function(e) { return e[1].fuoriUsoLog; });
-    if (!listAll.length) {
+  const data = attrezzi || {};
+  const listAll = Object.entries(data).filter(function(e) { return e[1].fuoriUsoLog; });
+  if (!listAll.length) {
       container.innerHTML = '<div class="empty-state">Nessun evento fuori uso registrato.</div>';
       return;
     }
@@ -1784,8 +1788,7 @@ function renderFuoriUsoPromemoria() {
       });
       html += '</div>';
     });
-    container.innerHTML = html;
-  });
+  container.innerHTML = html;
 }
 
 
