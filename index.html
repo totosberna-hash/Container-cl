@@ -1200,6 +1200,7 @@ function switchTab(tab) {
   document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
   if (tab==='log') renderLog();
   if (tab==='sessioni') renderSessioni();
+  if (tab==='fuoriuso') renderFuoriUsoPromemoria();
 }
 
 // ── ATTREZZI ──────────────────────────────────────────

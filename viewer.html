@@ -9,7 +9,7 @@
 <script>
 // ── FUORI USO VIEWER ──────────────────────────────────
 function renderFuoriUsoViewer() {
-  const container = document.getElementById('fuoriUsoViewerContainer');
+  const container = document.getElementById('fuoriUsoContainer');
   if (!container) return;
   const listAll = Object.entries(attrezzi).filter(function(e){ return e[1].fuoriUsoLog; });
   if (!listAll.length) {
@@ -279,6 +279,10 @@ function startSync() {
     attrezzi = snap.val() || {};
     renderAttrezzi();
     updateStats();
+    // Se il tab fuori uso è aperto, aggiorna automaticamente
+    if (document.getElementById('tabFuoriuso')?.classList.contains('active')) {
+      renderFuoriUsoViewer();
+    }
   });
   db.ref('movimenti').on('value', snap => {
     const d = snap.val() || {};
