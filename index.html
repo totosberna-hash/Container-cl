@@ -991,6 +991,7 @@ function flipCamera() { currentFacingMode = currentFacingMode==='environment'?'u
 
 // ── SCAN MODE ─────────────────────────────────────────
 function setMode(mode) {
+  if (!currentOperator) { showToast("⚠️ Prima identifica l'operatore con il badge","out"); return; }
   scanMode = mode;
   document.getElementById('btnIngresso').classList.toggle('active-mode', mode==='in');
   document.getElementById('btnUscita').classList.toggle('active-mode', mode==='out');
