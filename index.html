@@ -1722,9 +1722,13 @@ function confirmFuoriUso() {
   };
   attrezziRef.child(id).update({ fuoriUso });
   attrezziRef.child(id).child('fuoriUsoLog').push(logEntry);
+  // Aggiorna subito la variabile locale
+  if (!attrezzi[id].fuoriUsoLog) attrezzi[id].fuoriUsoLog = {};
+  attrezzi[id].fuoriUsoLog['_tmp_'+Date.now()] = logEntry;
+  attrezzi[id].fuoriUso = fuoriUso;
   document.getElementById('modalMotivoFuoriUso').classList.remove('open');
   showToast('🔴 Pezzo segnato fuori uso','out');
-  setTimeout(()=>renderFuoriUsoList(), 400);
+  setTimeout(()=>{ renderFuoriUsoList(); renderFuoriUsoPromemoria(); }, 400);
 }
 
 function changeFuoriUso(id, delta) {
@@ -1744,8 +1748,12 @@ function changeFuoriUso(id, delta) {
   };
   attrezziRef.child(id).update({ fuoriUso });
   attrezziRef.child(id).child('fuoriUsoLog').push(logEntry);
+  // Aggiorna subito la variabile locale
+  if (!attrezzi[id].fuoriUsoLog) attrezzi[id].fuoriUsoLog = {};
+  attrezzi[id].fuoriUsoLog['_tmp_'+Date.now()] = logEntry;
+  attrezzi[id].fuoriUso = fuoriUso;
   showToast('✅ Pezzo ripristinato','in');
-  setTimeout(()=>renderFuoriUsoList(), 400);
+  setTimeout(()=>{ renderFuoriUsoList(); renderFuoriUsoPromemoria(); }, 400);
 }
 
 
