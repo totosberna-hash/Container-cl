@@ -1281,8 +1281,10 @@ function saveAttrezzo() {
   if (qin>qtot) { showToast('Quantità nel container non può superare il totale','out'); return; }
   const fuoriUso = parseInt(document.getElementById('fFuoriUso').value)||0;
   if (fuoriUso > qtot) { showToast('Pezzi fuori uso non possono superare il totale','out'); return; }
+  const motivoManager = document.getElementById('fMotivoFuoriUso')?.value.trim() || '';
   const obj = { nome, qr, qtot, qin,
     fuoriUso,
+    motivoManager,
     dim: document.getElementById('fDim').value.trim(),
     container: document.getElementById('fContainer').value.trim(),
     cassa: document.getElementById('fCassa').value.trim(),
@@ -1782,6 +1784,7 @@ function renderFuoriUsoPromemoria() {
       html += '</div><div style="font-size:0.78rem;color:var(--text-dim);">Totale: ' + (a.qtot||0) + ' pz</div></div></div>';
       if (!logs.length) {
         html += '<div style="padding:10px;font-size:0.85rem;color:var(--text-dim);">📋 Inserito dal manager</div>';
+        if (a.motivoManager) html += '<div style="padding:2px 10px 10px;font-size:0.85rem;">📝 ' + escHtml(a.motivoManager) + '</div>';
       }
       logs.forEach(function(e2) {
         const log = e2[1];

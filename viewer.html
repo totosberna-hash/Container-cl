@@ -28,7 +28,7 @@ function renderFuoriUsoViewer() {
           '<div style="font-size:0.78rem;color:var(--text-dim);">Totale: ' + (a.qtot||0) + ' pz</div>' +
         '</div>' +
       '</div>' +
-      (logs.length === 0 ? '<div style="padding:10px;font-size:0.85rem;color:var(--text-dim);">📋 Inserito dal manager</div>' : ''),
+      (logs.length === 0 ? '<div style="padding:10px;font-size:0.85rem;color:var(--text-dim);">📋 Inserito dal manager</div>' + (a.motivoManager ? '<div style="padding:2px 10px 10px;font-size:0.85rem;">📝 ' + escHtml(a.motivoManager) + '</div>' : '') : '') +
       logs.map(function(e2) {
         const log = e2[1];
         return '<div style="background:' + (log.delta>0?'rgba(255,77,77,0.08)':'rgba(0,229,160,0.08)') + ';border:1px solid ' + (log.delta>0?'rgba(255,77,77,0.25)':'rgba(0,229,160,0.25)') + ';border-radius:10px;padding:12px;margin-bottom:8px;">' +
