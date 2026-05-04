@@ -389,6 +389,7 @@
             <div class="form-group"><div class="form-label">Quantità totale *</div><input class="form-input" id="fQtot" type="number" min="1" placeholder="es. 6"></div>
             <div class="form-group"><div class="form-label">Quantità nel container</div><input class="form-input" id="fQin" type="number" min="0" placeholder="es. 6"></div>
             <div class="form-group"><div class="form-label">🔴 Fuori uso</div><input class="form-input" id="fFuoriUso" type="number" min="0" value="0" placeholder="es. 1"></div>
+            <div class="form-group"><div class="form-label">Motivo fuori uso</div><input class="form-input" id="fMotivoFuoriUso" placeholder="es. Danneggiato, In riparazione..."></div>
             <div class="form-group"><div class="form-label">Dimensioni</div><input class="form-input" id="fDim" placeholder="es. 170 cm oro"></div>
             <div class="form-group"><div class="form-label">Container</div><input class="form-input" id="fContainer" placeholder="es. 36"></div>
             <div class="form-group"><div class="form-label">Cassa</div><input class="form-input" id="fCassa" placeholder="es. fuori cassa"></div>
@@ -1235,6 +1236,7 @@ function newAttrezzo() {
   document.getElementById('btnDeleteAttrezzo').style.display = 'none';
   ['fNome','fQr','fDim','fContainer','fCassa','fMaintDate','fMaintNote'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fFuoriUso').value=0;
+  document.getElementById('fMotivoFuoriUso').value='';
   document.getElementById('fQtot').value='1';
   document.getElementById('fQin').value='1';
   document.getElementById('attrezziList').style.display='none';
@@ -1254,6 +1256,7 @@ function editAttrezzo(id) {
   document.getElementById('fContainer').value  = a.container||'';
   document.getElementById('fCassa').value      = a.cassa||'';
   document.getElementById('fFuoriUso').value  = a.fuoriUso||0;
+  document.getElementById('fMotivoFuoriUso').value='';
   document.getElementById('fMaintDate').value = a.maintDate||'';
   document.getElementById('fMaintNote').value = a.maintNote||'';
   document.getElementById('attrezziList').style.display='none';
@@ -1280,8 +1283,26 @@ function saveAttrezzo() {
     maintDate: document.getElementById('fMaintDate').value.trim(),
     maintNote: document.getElementById('fMaintNote').value.trim()
   };
-  if (currentAttrezzoId) { attrezziRef.child(currentAttrezzoId).set(obj); }
-  else { attrezziRef.push(obj); }
+  if (currentAttrezzoId) {
+    const prev = attrezzi[currentAttrezzoId];
+    const prevFuoriUso = parseInt(prev?.fuoriUso)||0;
+    const delta = fuoriUso - prevFuoriUso;
+    if (prev?.fuoriUsoLog) obj.fuoriUsoLog = prev.fuoriUsoLog;
+    if (delta !== 0 && currentOperator) {
+      const now = new Date();
+      const logEntry = {
+        ts: Date.now(),
+        delta,
+        motivo: (document.getElementById('fMotivoFuoriUso')?.value.trim() || (delta > 0 ? 'Modificato manualmente' : 'Ripristinato')),
+        operatore: currentOperator.nome + ' ' + currentOperator.cognome,
+        data: now.toLocaleDateString('it-IT'),
+        orario: now.toLocaleTimeString('it-IT')
+      };
+      if (!obj.fuoriUsoLog) obj.fuoriUsoLog = {};
+      obj.fuoriUsoLog['man_'+Date.now()] = logEntry;
+    }
+    attrezziRef.child(currentAttrezzoId).set(obj);
+  } else { attrezziRef.push(obj); }
   showToast('✅ Attrezzatura salvata','in');
   backToAttrezzi();
 }
