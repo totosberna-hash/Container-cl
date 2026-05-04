@@ -1720,15 +1720,16 @@ function confirmFuoriUso() {
     data: now.toLocaleDateString('it-IT'),
     orario: now.toLocaleTimeString('it-IT')
   };
-  attrezziRef.child(id).update({ fuoriUso });
-  attrezziRef.child(id).child('fuoriUsoLog').push(logEntry);
-  // Aggiorna subito la variabile locale
-  if (!attrezzi[id].fuoriUsoLog) attrezzi[id].fuoriUsoLog = {};
-  attrezzi[id].fuoriUsoLog['_tmp_'+Date.now()] = logEntry;
-  attrezzi[id].fuoriUso = fuoriUso;
+  const logKey = 'log_' + Date.now();
+  const updates = {};
+  updates['fuoriUso'] = fuoriUso;
+  updates['fuoriUsoLog/' + logKey] = logEntry;
+  attrezziRef.child(id).update(updates).then(() => {
+    renderFuoriUsoList();
+    renderFuoriUsoPromemoria();
+  });
   document.getElementById('modalMotivoFuoriUso').classList.remove('open');
   showToast('🔴 Pezzo segnato fuori uso','out');
-  setTimeout(()=>{ renderFuoriUsoList(); renderFuoriUsoPromemoria(); }, 400);
 }
 
 function changeFuoriUso(id, delta) {
@@ -1746,14 +1747,15 @@ function changeFuoriUso(id, delta) {
     data: now.toLocaleDateString('it-IT'),
     orario: now.toLocaleTimeString('it-IT')
   };
-  attrezziRef.child(id).update({ fuoriUso });
-  attrezziRef.child(id).child('fuoriUsoLog').push(logEntry);
-  // Aggiorna subito la variabile locale
-  if (!attrezzi[id].fuoriUsoLog) attrezzi[id].fuoriUsoLog = {};
-  attrezzi[id].fuoriUsoLog['_tmp_'+Date.now()] = logEntry;
-  attrezzi[id].fuoriUso = fuoriUso;
+  const logKey = 'log_' + Date.now();
+  const updates = {};
+  updates['fuoriUso'] = fuoriUso;
+  updates['fuoriUsoLog/' + logKey] = logEntry;
+  attrezziRef.child(id).update(updates).then(() => {
+    renderFuoriUsoList();
+    renderFuoriUsoPromemoria();
+  });
   showToast('✅ Pezzo ripristinato','in');
-  setTimeout(()=>{ renderFuoriUsoList(); renderFuoriUsoPromemoria(); }, 400);
 }
 
 
